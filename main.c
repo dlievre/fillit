@@ -6,7 +6,7 @@
 /*   By: dlievre <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/12 15:05:05 by dlievre           #+#    #+#             */
-/*   Updated: 2016/12/16 18:15:46 by dlievre          ###   ########.fr       */
+/*   Updated: 2016/12/16 18:21:03 by dlievre          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,8 @@ int		*read_elem(char *file,int *tbltetrim)
 	notetrim = 0;
 	while (read(fd, buf, (16 + 4 + 1)) > 0)
 	{
-		printf("\nRead Element : %d ", notetrim); ft_putchar('A' + notetrim);ft_putchar('\n');
+	//	printf("\nRead Element : %d ", notetrim); ft_putchar('A' + notetrim);ft_putchar('\n');
+		ft_putstr("Read Element : "); ft_putnbr(notetrim);ft_putchar('A' + notetrim);ft_putchar('\n');
 		bin = 0b0000000000000000;
 		while (*buf)
 		{
@@ -110,7 +111,7 @@ int		main(int argc, char **argv )
 		n++;
 
 	}
-ft_putstr("ordre des tetriminos integre : ");ft_putstr(ok);
+ft_putstr("ordre des tetriminos : ");ft_putstr(ok);
 	return (0);
 }
 
