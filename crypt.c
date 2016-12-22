@@ -6,7 +6,7 @@
 /*   By: dlievre <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/20 15:03:22 by dlievre           #+#    #+#             */
-/*   Updated: 2016/12/22 12:30:44 by dlievre          ###   ########.fr       */
+/*   Updated: 2016/12/22 15:27:10 by dlievre          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,8 @@ char		get_menu(char *file)
 	printf("\tA\tAjouter\n");
 	printf("\tS\tSupprimer\n");
 	printf("\n\n");
-	printf("\tC\tCrypter > Fichier\n");
-	printf("\tM\tCrypter > Memoire\n");
+	printf("\tK\tKey de cryptage\n");
+	printf("\tC\tCrypter > Fichiers\n");
 	printf("\tL\tLecture Binaire\n");
 	printf("\n\tX\tExit\n");
 	printf("\n\tEntrez votre choix : ");
@@ -85,13 +85,13 @@ int		fn_read_binary(char *file)
 	return(0);
 }
 
-int		crypt_file(char *file)
+int		crypt_file(char *file, char *cle)
 {
 	int				fdr;
 	int				fdw[3];
 	char	*buf;
 	char	*bin;
-	char			*cle;
+//	char			*cle;
 	char			**filecrypt;
 	int				count;
 	int				i;
@@ -107,7 +107,7 @@ int		crypt_file(char *file)
 	filecrypt[1] = ft_strjoin(file, ".cr2");
 //	filecrypt[2] = ft_strjoin(file, ".cr3");
 
-	cle = "dominiqu";
+//	cle = "dominiqu";
 	buf = malloc(8 * sizeof(unsigned char));
 	bin = malloc(8 * sizeof(unsigned char));
 	fn_aff_titre("Cryptage du Fichier");
@@ -133,7 +133,6 @@ int		crypt_file(char *file)
 	while ((count = read(fdr, buf, 8)) > 0)
 	{
 		i = 0;
-	//	c = 0;
 		while (i < count && buf[i] != '\0')
 		{
 			if (buf[i] == '\n' || buf[i] == '\t')
@@ -143,19 +142,15 @@ int		crypt_file(char *file)
 			ft_putbin(buf[i], 8, ' ');
 			bin[i] = buf[i];
 			bin[i] = bin[i] + cle[c];
-						ft_putchar(cle[c]);
+//			ft_putchar('<');ft_putnbr(c);ft_putchar(cle[c]);ft_putchar('>');
 			ft_putbin(bin[i], 8, ' ');
 			bin[i] = 0xFF ^ bin[i];
 			ft_putbin(bin[i], 8, '|');
-			/*bin[i] = 0xFF ^ bin[i];
-			ft_putbin(bin[i], 8, ' ');
-			bin[i] = bin[i] - cle[i] + 3;
-			ft_putbin(bin[i], 8, bin[i]);*/
 			write(fdw[0],(bin + i), 1);
 			ft_putchar(bin[i]);
 			ft_putchar('\n');
 			i++;
-			if (i < count)
+			if (i < count && buf[i] != '\0')
 			{
 			if (buf[i] == '\n' || buf[i] == '\t')
 				ft_putchar('.');
@@ -168,44 +163,34 @@ int		crypt_file(char *file)
 			ft_putbin(bin[i], 8, ' ');
 			bin[i] = 0xFF ^ bin[i];
 			ft_putbin(bin[i], 8, '|');
-			/*bin[i] = 0xFF ^ bin[i];
-			ft_putbin(bin[i], 8, ' ');
-			bin[i] = bin[i] - cle[i] + 3;
-			ft_putbin(bin[i], 8, bin[i]);*/
 			ft_putchar(bin[i]);
-
 			ft_putchar('\n');
 			write(fdw[1],(bin + i), 1);
 			}
 			i++;
-//			c++;
-			c = (c > 8) ? 0 : c + 1;
-		//	ft_putchar('<');ft_putnbr(c);ft_putchar('>');
+			c = (c > 7) ? 0 : c + 1;
 		}
 	}
 	bin[i] = '\0';
 	write(fdw[0],(bin + i), 1);
 	write(fdw[1],(bin + i), 1);
-
-//	ft_putchar_fd(pbin, fdw);
 	free(buf);
 	free(bin);
 	free(filecrypt);
 	close (fdr);
-	close (fdw[0]);	close (fdw[1]);
-
+	close (fdw[0]);
+	close (fdw[1]);
 	return (0);
 }
 
-int		decrypt_file(char *file)
+int		decrypt_file(char *file, char *cle)
 {
-//	int				fdr;
 	int				fdr[3];
 	char	*buf0;
 	char	*buf1;
 	char	*bin0;
 	char	*bin1;
-	char			*cle;
+//	char			*cle;
 	char			**filecrypt;
 	int				count[2];
 	int				i;
@@ -216,12 +201,10 @@ int		decrypt_file(char *file)
 	filecrypt[0] = malloc(sizeof(char) * (ft_strlen(file) + 4 + 1));
 	filecrypt[1] = malloc(sizeof(char) * (ft_strlen(file) + 4 + 1));
 //	filecrypt[2] = malloc(sizeof(char) * (ft_strlen(file) + 4 + 1));
-
 	filecrypt[0] = ft_strjoin(file, ".cr1");
 	filecrypt[1] = ft_strjoin(file, ".cr2");
 //	filecrypt[2] = ft_strjoin(file, ".cr3");
-
-	cle = "dominiqu";
+//	cle = "dominiqu";
 	buf0 = malloc(8 * sizeof(unsigned char));
 	buf1 = malloc(8 * sizeof(unsigned char));
 	bin0 = malloc(8 * sizeof(unsigned char));
@@ -253,7 +236,7 @@ int		decrypt_file(char *file)
 			ft_putbin(bin0[i], 8, ' ');
 			ft_putchar(bin0[i]);
 			ft_putchar('\n');
-			if (i < count[1])
+			if (i < count[1] && buf1[i] != '\0')
 			{
 				ft_putchar(buf1[i]); ft_putchar(' ');
 				ft_putbin(buf1[i], 8, '.');
@@ -279,57 +262,14 @@ int		decrypt_file(char *file)
 
 	return (0);
 }
-/*int		decrypt_file(char *file)
-{
-	int		fdr;
-	char	*buf;
-	char	*bin;
-	char	*cle;
-	int		i;
-	int		count;
 
-	cle = "dominiqu";
-	buf = malloc(8 * sizeof(char));
-	bin = malloc(8 * sizeof(char));
-
-	fdr = open(file, O_RDONLY);
-	if (fdr == -1)
-	{
-		printf("Erreur lecture fichier %s\n", file);
-		return (1);
-	}
-	fn_aff_titre("Decryptage Fichier ");
-	ft_putstr("Lettre Binaire decallage >> ouexclusif \n");
-
-	while ((count = read(fdr, buf, 8)) > 0)
-	{
-		i = 0;
-		while (i < count)
-		{
-		ft_putbin(buf[i], 16, ' ');
-		bin[i] = buf[i] >> 1;
-		ft_putbin(bin[i], 16, ' ');
-			bin[i] = cle[i] ^ buf[i];
-
-		ft_putchar(' ');
-		ft_putbin(*buf, 16, ' ');
-		ft_putchar(' ');
-		ft_putchartohex(*buf);
-		ft_putchar(' ');
-
-		ft_putnbr('\0' + *buf);
-		ft_putchar('\n');
-		i++;
-		}
-	}
-	return(0);
-}
-*/
 int		main(int argc, char **argv )
 {
 	char		menu;
 	char		*file;
+	char		*cle;
 
+	cle = "dominiqu";
 	file = ft_memalloc(sizeof(char) * 20);
 	if (argv[1])
 		file = argv[1];
@@ -337,10 +277,16 @@ int		main(int argc, char **argv )
 	{
 		if (ft_tolower(menu) == 'l')
 			fn_read_binary(file);
+		if (ft_tolower(menu) == 'k')
+		{
+			ft_putstrstr("\t \n", "cle de cryptage actuelle : ", cle);
+			printf("\n\tEntrez la nouvelle cle de cryptage : ");
+			scanf("%s", cle);
+		}
 		if (ft_tolower(menu) == 'c')
-			crypt_file(file);
+			crypt_file(file, cle);
 		if (ft_tolower(menu) == 'd')
-			decrypt_file(file);
+			decrypt_file(file, cle);
 
 		if (ft_tolower(menu) == 'f')
 		{

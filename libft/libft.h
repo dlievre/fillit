@@ -6,7 +6,7 @@
 /*   By: dlievre <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/16 18:03:00 by dlievre           #+#    #+#             */
-/*   Updated: 2016/12/21 13:55:49 by dlievre          ###   ########.fr       */
+/*   Updated: 2016/12/22 15:16:44 by dlievre          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,4 +91,5 @@ void				ft_lstprint(t_list *lst);
 int					ft_putbin(unsigned int bin, int nbits, char c);
 void				ft_tblinit(int *tbl, size_t len);
 int					ft_putchartohex(char str);
+void				ft_putstrstr(char *bfrmdlaft, char const *f, const char *s);
 #endif
