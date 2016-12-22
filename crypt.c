@@ -6,7 +6,7 @@
 /*   By: dlievre <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/20 15:03:22 by dlievre           #+#    #+#             */
-/*   Updated: 2016/12/22 15:27:10 by dlievre          ###   ########.fr       */
+/*   Updated: 2016/12/22 18:11:32 by dlievre          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,13 +142,14 @@ int		crypt_file(char *file, char *cle)
 			ft_putbin(buf[i], 8, ' ');
 			bin[i] = buf[i];
 			bin[i] = bin[i] + cle[c];
-//			ft_putchar('<');ft_putnbr(c);ft_putchar(cle[c]);ft_putchar('>');
+			ft_putchar(cle[c]);ft_putchar(' ');
 			ft_putbin(bin[i], 8, ' ');
 			bin[i] = 0xFF ^ bin[i];
-			ft_putbin(bin[i], 8, '|');
+			ft_putbin(bin[i], 8, '\t');
 			write(fdw[0],(bin + i), 1);
 			ft_putchar(bin[i]);
 			ft_putchar('\n');
+			c = (c > ft_strlen(cle) - 1) ? 0 : c + 1;
 			i++;
 			if (i < count && buf[i] != '\0')
 			{
@@ -159,16 +160,16 @@ int		crypt_file(char *file, char *cle)
 			ft_putbin(buf[i], 8, ' ');
 			bin[i] = buf[i];
 			bin[i] = bin[i] + cle[c];
-						ft_putchar(cle[c]);
+			ft_putchar(cle[c]);ft_putchar(' ');
 			ft_putbin(bin[i], 8, ' ');
 			bin[i] = 0xFF ^ bin[i];
-			ft_putbin(bin[i], 8, '|');
+			ft_putbin(bin[i], 8, '\t');
 			ft_putchar(bin[i]);
 			ft_putchar('\n');
 			write(fdw[1],(bin + i), 1);
 			}
 			i++;
-			c = (c > 7) ? 0 : c + 1;
+			c = (c > ft_strlen(cle) - 1) ? 0 : c + 1;
 		}
 	}
 	bin[i] = '\0';
@@ -220,46 +221,63 @@ int		decrypt_file(char *file, char *cle)
 			return (1);
 		}
 	}
+		c = 0;
 	while ((count[0] = read(fdr[0], buf0, 8)) > 0)
 	{
 		count[1] = read(fdr[1], buf1, 8); 
 		i = 0;
-		c = 0;
+//		c = 0;
 		while (i < count[0] && buf0[i] != '\0')
 		{
-			ft_putchar(buf0[i]); ft_putchar(' ');
+			ft_putchar(buf0[i]); ft_putchar('\t');
 			ft_putbin(buf0[i], 8, ' ');
 			bin0[i] = 0xFF ^ buf0[i];
 			ft_putbin(bin0[i], 8, ' ');
 			bin0[i] = bin0[i] - cle[c];
-			ft_putchar(cle[c]);
-			ft_putbin(bin0[i], 8, ' ');
+			ft_putchar(cle[c]);ft_putchar(' ');
+			ft_putbin(bin0[i], 8, '\t');
 			ft_putchar(bin0[i]);
 			ft_putchar('\n');
+			c = (c > ft_strlen(cle) - 1) ? 0 : c + 1;
 			if (i < count[1] && buf1[i] != '\0')
 			{
-				ft_putchar(buf1[i]); ft_putchar(' ');
-				ft_putbin(buf1[i], 8, '.');
+				ft_putchar(buf1[i]); ft_putchar('\t');
+				ft_putbin(buf1[i], 8, ' ');
 				bin1[i] = 0xFF ^ buf1[i];
 				ft_putbin(bin1[i], 8, ' ');
-				bin1[i] = bin1[i] - cle[c];// + 3;
-				ft_putchar(cle[c]);
-
-				ft_putbin(bin1[i], 8, ' ');
+				bin1[i] = bin1[i] - cle[c];
+				ft_putchar(cle[c]);ft_putchar(' ');
+				ft_putbin(bin1[i], 8, '\t');
 				ft_putchar(bin1[i]);ft_putchar('\n');
 			}
 			i++;
-			c++;
+			c = (c > ft_strlen(cle) - 1) ? 0 : c + 1;
 		}
+		ft_putchar('\n');
 	}
-
 	free(buf0);
 	free(buf1);
 	free(bin0);
 	free(bin1);
 	free(filecrypt);
-	close (fdr[0]);	close (fdr[1]);
+	close (fdr[0]);
+	close (fdr[1]);
+	return (0);
+}
 
+int		modif_key(char *cle, int afftitre)
+{
+	if (afftitre == 1)
+		fn_aff_titre("Modification Cle cryptage");
+	if (ft_strlen(cle) > 0)
+		ft_putstrstr("\t \n", "\n\tcle de cryptage actuelle : ", cle);
+	printf("\n\tEntrez la Cle de cryptage a l'abri des regards : ");
+	scanf("%s", cle);
+	if (ft_strlen(cle) > 20 || ft_strlen(cle) < 5)
+	{
+		ft_putstr("\n\tCle invalide : de 4 - 20 caracteres\n");
+		modif_key(cle, 0);
+	}
 	return (0);
 }
 
@@ -268,8 +286,11 @@ int		main(int argc, char **argv )
 	char		menu;
 	char		*file;
 	char		*cle;
+	char		*version;
 
-	cle = "dominiqu";
+	version = "v1.a";
+	cle = ft_memalloc(sizeof(char) * 20);
+//	cle = "dominiquephoteam\0";
 	file = ft_memalloc(sizeof(char) * 20);
 	if (argv[1])
 		file = argv[1];
@@ -277,12 +298,14 @@ int		main(int argc, char **argv )
 	{
 		if (ft_tolower(menu) == 'l')
 			fn_read_binary(file);
-		if (ft_tolower(menu) == 'k')
+		if (menu == '?')
 		{
+			fn_aff_titre("Informations");
+			ft_putstrstr("\t \n", "Version : ", version);
 			ft_putstrstr("\t \n", "cle de cryptage actuelle : ", cle);
-			printf("\n\tEntrez la nouvelle cle de cryptage : ");
-			scanf("%s", cle);
 		}
+		if (ft_tolower(menu) == 'k')
+			modif_key(cle, 1);
 		if (ft_tolower(menu) == 'c')
 			crypt_file(file, cle);
 		if (ft_tolower(menu) == 'd')
