@@ -6,7 +6,7 @@
 /*   By: dlievre <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/20 15:03:22 by dlievre           #+#    #+#             */
-/*   Updated: 2016/12/21 14:44:42 by dlievre          ###   ########.fr       */
+/*   Updated: 2016/12/22 12:30:44 by dlievre          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,10 +129,11 @@ int		crypt_file(char *file)
 			return (1);
 		}
 	}
+	c = 0;
 	while ((count = read(fdr, buf, 8)) > 0)
 	{
 		i = 0;
-		c = 0;
+	//	c = 0;
 		while (i < count && buf[i] != '\0')
 		{
 			if (buf[i] == '\n' || buf[i] == '\t')
@@ -151,6 +152,8 @@ int		crypt_file(char *file)
 			bin[i] = bin[i] - cle[i] + 3;
 			ft_putbin(bin[i], 8, bin[i]);*/
 			write(fdw[0],(bin + i), 1);
+			ft_putchar(bin[i]);
+			ft_putchar('\n');
 			i++;
 			if (i < count)
 			{
@@ -169,11 +172,15 @@ int		crypt_file(char *file)
 			ft_putbin(bin[i], 8, ' ');
 			bin[i] = bin[i] - cle[i] + 3;
 			ft_putbin(bin[i], 8, bin[i]);*/
+			ft_putchar(bin[i]);
+
 			ft_putchar('\n');
 			write(fdw[1],(bin + i), 1);
 			}
 			i++;
-			c++;
+//			c++;
+			c = (c > 8) ? 0 : c + 1;
+		//	ft_putchar('<');ft_putnbr(c);ft_putchar('>');
 		}
 	}
 	bin[i] = '\0';
@@ -230,7 +237,6 @@ int		decrypt_file(char *file)
 			return (1);
 		}
 	}
-// au deuxieme passage ca marche plus
 	while ((count[0] = read(fdr[0], buf0, 8)) > 0)
 	{
 		count[1] = read(fdr[1], buf1, 8); 
@@ -238,25 +244,26 @@ int		decrypt_file(char *file)
 		c = 0;
 		while (i < count[0] && buf0[i] != '\0')
 		{
+			ft_putchar(buf0[i]); ft_putchar(' ');
 			ft_putbin(buf0[i], 8, ' ');
 			bin0[i] = 0xFF ^ buf0[i];
 			ft_putbin(bin0[i], 8, ' ');
-			bin0[i] = bin0[i] - cle[c];// + 3;
+			bin0[i] = bin0[i] - cle[c];
 			ft_putchar(cle[c]);
-			ft_putbin(bin0[i], 8, '|');
-
+			ft_putbin(bin0[i], 8, ' ');
 			ft_putchar(bin0[i]);
-				ft_putchar(' ');
-
+			ft_putchar('\n');
 			if (i < count[1])
 			{
-			ft_putbin(buf1[i], 8, '.');
-			bin1[i] = 0xFF ^ buf1[i];
-			ft_putbin(bin1[i], 8, ' ');
-			bin1[i] = bin1[i] - cle[c];// + 3;
-			ft_putbin(bin1[i], 8, ' ');
-			//ft_putchar(cle[c]);
-			ft_putchar(bin1[i]);ft_putchar('\n');
+				ft_putchar(buf1[i]); ft_putchar(' ');
+				ft_putbin(buf1[i], 8, '.');
+				bin1[i] = 0xFF ^ buf1[i];
+				ft_putbin(bin1[i], 8, ' ');
+				bin1[i] = bin1[i] - cle[c];// + 3;
+				ft_putchar(cle[c]);
+
+				ft_putbin(bin1[i], 8, ' ');
+				ft_putchar(bin1[i]);ft_putchar('\n');
 			}
 			i++;
 			c++;
