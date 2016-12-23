@@ -6,7 +6,7 @@
 #    By: dlievre <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2016/09/12 15:43:15 by dlievre           #+#    #+#              #
-#    Updated: 2016/12/23 11:32:47 by dlievre          ###   ########.fr        #
+#    Updated: 2016/12/23 11:48:26 by dlievre          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,3 +35,7 @@ fclean: clean
 
 re: fclean all
 
+woutflag: $(OBJ)
+		$(GCC) $(HEADER) -c $(LIB_FILES)
+		ar rc $(LIB) $(OBJ)
+		ranlib $(LIB)
