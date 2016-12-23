@@ -6,7 +6,7 @@
 /*   By: dlievre <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/20 15:03:22 by dlievre           #+#    #+#             */
-/*   Updated: 2016/12/23 17:02:40 by dlievre          ###   ########.fr       */
+/*   Updated: 2016/12/23 17:32:55 by dlievre          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -230,6 +230,7 @@ int		decrypt_file(char *file, char *cle, int afcode)
 			printf("Erreur lecture fichier %s\n", filecrypt[i]);
 			return (1);
 		}
+		ft_putchar('\n');
 	}
 	c = 0;
 	while ((count[0] = read(fdr[0], buf0, 8)) > 0)
