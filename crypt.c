@@ -6,7 +6,7 @@
 /*   By: dlievre <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/20 15:03:22 by dlievre           #+#    #+#             */
-/*   Updated: 2016/12/26 18:38:24 by dlievre          ###   ########.fr       */
+/*   Updated: 2016/12/26 18:45:10 by dlievre          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,12 +96,8 @@ int		fn_read_binary(char *file)
 int		ft_rotatebin(int bin, char sens, int dec)
 {
 	int bit;
-	bin = bin & 0x00FF;
-	ft_putchar('(');ft_putbin(bin, 8, ')');
-	ft_putnbr(dec);
-/*	dec = ft_atoi(dec);
-	ft_putnbr(dec);*/
 
+	bin = bin & 0x00FF;// suppression des 2 octeds a gauche
 	if ( !bin || !sens || !dec)
 		return (1);
 	while ( dec-- > 0)
@@ -123,7 +119,6 @@ int		ft_rotatebin(int bin, char sens, int dec)
 			bin = bin | bit;
 		}
 	}
-	ft_putchar('(');ft_putbin(bin, 8, ')');
 	return (bin);
 }
 
