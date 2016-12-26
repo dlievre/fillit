@@ -6,7 +6,7 @@
 /*   By: dlievre <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/20 15:03:22 by dlievre           #+#    #+#             */
-/*   Updated: 2016/12/26 18:45:10 by dlievre          ###   ########.fr       */
+/*   Updated: 2016/12/26 20:46:37 by dlievre          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,9 +185,6 @@ int		crypt_file(char *file, char *cle, char *clerot)
 				ft_putchar(clerot[r]);ft_putchar(' ');
 			bin[i] = ft_rotatebin(bin[i], 'l', clerot[r] - '0');
 			ft_putbin(bin[i], 8, ' ');
-
-//ft_putbin(ft_rotatebin(bin[i], 'l', 1), 8, 's');
-
 			bin[i] = 0xFF ^ bin[i];
 			ft_putbin(bin[i], 8, '\t');
 			write(fdw[0],(bin + i), 1);
@@ -210,7 +207,6 @@ int		crypt_file(char *file, char *cle, char *clerot)
 				ft_putchar(clerot[r]);ft_putchar(' ');
 				bin[i] = ft_rotatebin(bin[i], 'l', clerot[r] - '0');
 				ft_putbin(bin[i], 8, ' ');
-
 				bin[i] = 0xFF ^ bin[i];
 				ft_putbin(bin[i], 8, '\t');
 				ft_putchar(bin[i]);
@@ -235,9 +231,6 @@ int		crypt_file(char *file, char *cle, char *clerot)
 	return (0);
 }
 
-
-
-
 int		decrypt_file(char *file, char *cle, char *clerot, int afcode)
 {
 	int		fdr[3];
@@ -250,8 +243,6 @@ int		decrypt_file(char *file, char *cle, char *clerot, int afcode)
 	int		i;
 	int		c;
 	int		r;
-	//	char	menu;
-	//	unsigned char	*pbin;
 
 	filecrypt = ft_memalloc((3 + 1) * sizeof(*filecrypt));
 	filecrypt[0] = malloc(sizeof(char) * (ft_strlen(file) + 4 + 1));
@@ -260,7 +251,6 @@ int		decrypt_file(char *file, char *cle, char *clerot, int afcode)
 	filecrypt[0] = ft_strjoin(file, ".cr1");
 	filecrypt[1] = ft_strjoin(file, ".cr2");
 	//	filecrypt[2] = ft_strjoin(file, ".cr3");
-	//	cle = "dominiqu";
 	buf0 = malloc(8 * sizeof(unsigned char));
 	buf1 = malloc(8 * sizeof(unsigned char));
 	bin0 = malloc(8 * sizeof(unsigned char));
@@ -269,22 +259,22 @@ int		decrypt_file(char *file, char *cle, char *clerot, int afcode)
 		fn_aff_titre("Decryptage du Fichier");
 	for (i = 0 ; i < 2 ; i++)
 	{
-		ft_putstr("Open fichier ");ft_putstr(filecrypt[i]); ft_putchar('\n');
+		ft_putstr("Open fichier ");
+		ft_putendl(filecrypt[i]);// ft_putchar('\n');
 		fdr[i] = open(filecrypt[i],  O_RDONLY);
 		if (fdr[i] == -1)
 		{
 			printf("Erreur lecture fichier %s\n", filecrypt[i]);
 			return (1);
 		}
-		ft_putchar('\n');
 	}
+	ft_putchar('\n');
 	c = 0;
 	r = 0;
 	while ((count[0] = read(fdr[0], buf0, 8)) > 0)
 	{
 		count[1] = read(fdr[1], buf1, 8); 
 		i = 0;
-		//		c = 0;
 		while (i < count[0] && buf0[i] != '\0')
 		{
 			if (afcode)
@@ -294,16 +284,19 @@ int		decrypt_file(char *file, char *cle, char *clerot, int afcode)
 			}
 			bin0[i] = 0xFF ^ buf0[i];
 			if (afcode)
+			{
 				ft_putbin(bin0[i], 8, ' ');
-			if (afcode)
-				ft_putchar(clerot[r]);ft_putchar(' ');
+				ft_putchar(clerot[r]);
+				ft_putchar(' ');
+			}
 			bin0[i] = ft_rotatebin(bin0[i], 'r', clerot[r] - '0');
 			if (afcode)
 				ft_putbin(bin0[i], 8, ' ');
 			bin0[i] = bin0[i] - cle[c];
 			if (afcode)
 			{
-				ft_putchar(cle[c]);ft_putchar(' ');
+				ft_putchar(cle[c]);
+				ft_putchar(' ');
 				ft_putbin(bin0[i], 8, '\t');
 			}
 			ft_putchar(bin0[i]);
@@ -315,21 +308,26 @@ int		decrypt_file(char *file, char *cle, char *clerot, int afcode)
 			{
 				if (afcode)
 				{
-					ft_putchar(buf1[i]); ft_putchar('\t');
+					ft_putchar(buf1[i]); 
+					ft_putchar('\t');
 					ft_putbin(buf1[i], 8, ' ');
 				}
 				bin1[i] = 0xFF ^ buf1[i];
 				if (afcode)
 					ft_putbin(bin0[i], 8, ' ');
 				if (afcode)
-					ft_putchar(clerot[r]);ft_putchar(' ');
+				{
+					ft_putchar(clerot[r]);
+					ft_putchar(' ');
+				}
 				bin1[i] = ft_rotatebin(bin1[i], 'r', clerot[r] - '0');
 				if (afcode)
 					ft_putbin(bin1[i], 8, ' ');
 				bin1[i] = bin1[i] - cle[c];
 				if (afcode)
 				{
-					ft_putchar(cle[c]);ft_putchar(' ');
+					ft_putchar(cle[c]);
+					ft_putchar(' ');
 					ft_putbin(bin1[i], 8, '\t');
 				}
 				ft_putchar(bin1[i]);
@@ -406,6 +404,11 @@ int		modif_keyrot(char *clerot, int afftitre)
 	return (0);
 }
 
+void	fn_majvar(char *var, char *val)
+{
+	while (*val != '\0')
+		*var++ = *val++;
+}
 
 int		main(int argc, char **argv )
 {
@@ -414,14 +417,13 @@ int		main(int argc, char **argv )
 	char		*cle;
 	char		*clerot;
 	char		*version;
-	//	char		buf[1];
+	char		*clebis;
 
 	version = "v1.b";
 	cle = ft_memalloc(sizeof(char) * 20);
 	clerot = ft_memalloc(sizeof(char) * 10);
-
-cle = "dominiquephoteam\0";
-clerot = "1234";
+	fn_majvar(cle, "dominiquephoteam");
+	fn_majvar(clerot, "1234");
 	file = ft_memalloc(sizeof(char) * 20);
 	if (argv[1])
 		file = argv[1];
