@@ -6,7 +6,7 @@
 /*   By: dlievre <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/20 15:03:22 by dlievre           #+#    #+#             */
-/*   Updated: 2016/12/27 17:09:41 by dlievre          ###   ########.fr       */
+/*   Updated: 2016/12/26 20:52:04 by dlievre          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int		fn_aff_titre(char *str)
 	return (0);
 }
 
-void	aff_menu(char *file)
+void		aff_menu(char *file)
 {
 	ft_putstr("\n\n");
 	fn_aff_titre("Crypto de donnees");
@@ -51,21 +51,21 @@ void	aff_menu(char *file)
 	ft_putstr("\n\tEntrez votre choix : ");
 }
 
-char	keybord(void)
+char	keybord()
 {
-	int		count;
+	int	count;
 	char	buf[1];
 
-	while ((count = read(0, buf, sizeof(buf))) > 0)
+	while((count = read(0, buf, sizeof(buf))) >0)
 		if (ft_strchr("FfVvEeAaSsKkCcDdLlXx?\n", buf[0]) != NULL)
-			break ;
+			break;
 	return (buf[0]);
 }
 
 int		fn_read_binary(char *file)
 {
-	int				fdr;
-	unsigned char	*buf;
+	int		fdr;
+	char	*buf;
 
 	buf = malloc(8 * sizeof(char));
 	fdr = open(file, O_RDONLY);
@@ -90,14 +90,14 @@ int		fn_read_binary(char *file)
 		ft_putchar('\n');
 	}
 	keybord();
-	return (0);
+	return(0);
 }
 
-int		ft_rotatebin(unsigned int bin, char sens, int dec)
+int		ft_rotatebin(int bin, char sens, int dec)
 {
-	unsigned int bit;
+	int bit;
 
-	bin = bin & 0x00FF;// suppression des 2 octeds a gauche sur base 4 octeds
+	bin = bin & 0x00FF;// suppression des 2 octeds a gauche
 	if ( !bin || !sens || !dec)
 		return (1);
 	while ( dec-- > 0)
@@ -105,16 +105,16 @@ int		ft_rotatebin(unsigned int bin, char sens, int dec)
 		if (sens == 'r')
 		{
 			bit = 0;
-			if ((bin & 0x0001) == 0x0001)
-				bit = 0x0080;
+			if ((bin & 0x01) == 0x01)
+				bit = 0x80;
 			bin = bin >> 1;
 			bin = bin | bit;
 		}
 		if (sens == 'l')
 		{
 			bit = 0;
-			if ((bin & 0x0080) == 0x0080)
-				bit = 0x0001;
+			if ((bin & 0x80) == 0x80)
+				bit = 0x01;
 			bin = bin << 1;
 			bin = bin | bit;
 		}
@@ -122,12 +122,12 @@ int		ft_rotatebin(unsigned int bin, char sens, int dec)
 	return (bin);
 }
 
-int		crypt_file(char *file, unsigned char *cle, unsigned char *clerot)
+int		crypt_file(char *file, char *cle, char *clerot)
 {
 	int				fdr;
 	int				fdw[3];
-	unsigned char	*buf;
-	unsigned char	*bin;
+	char			*buf;
+	char			*bin;
 	char			**filecrypt;
 	int				count;
 	int				i;
@@ -139,9 +139,11 @@ int		crypt_file(char *file, unsigned char *cle, unsigned char *clerot)
 	filecrypt[0] = malloc(sizeof(char) * (ft_strlen(file) + 4 + 1));
 	filecrypt[1] = malloc(sizeof(char) * (ft_strlen(file) + 4 + 1));
 	//	filecrypt[2] = malloc(sizeof(char) * (ft_strlen(file) + 4 + 1));
+
 	filecrypt[0] = ft_strjoin(file, ".cr1");
 	filecrypt[1] = ft_strjoin(file, ".cr2");
 	//	filecrypt[2] = ft_strjoin(file, ".cr3");
+
 	//	cle = "dominiqu";
 	buf = malloc(8 * sizeof(unsigned char));
 	bin = malloc(8 * sizeof(unsigned char));
@@ -154,9 +156,7 @@ int		crypt_file(char *file, unsigned char *cle, unsigned char *clerot)
 	}
 	for (i = 0 ; i < 2 ; i++)
 	{
-		ft_putstr("Open fichier ");
-		ft_putstr(filecrypt[i]);
-		ft_putchar('\n');
+		ft_putstr("Open fichier ");ft_putstr(filecrypt[i]); ft_putchar('\n');
 		fdw[i] = open(filecrypt[i], O_CREAT | O_APPEND, S_IREAD | S_IWRITE);
 		close (fdw[i]);
 		fdw[i] = open(filecrypt[i], O_WRONLY);
@@ -176,74 +176,68 @@ int		crypt_file(char *file, unsigned char *cle, unsigned char *clerot)
 			if (buf[i] == '\n' || buf[i] == '\t')
 				ft_putchar('.');
 			else
-				ft_putchar(buf[i]);
-			ft_putchar(' ');
+				ft_putchar(buf[i]);ft_putchar(' ');
 			ft_putbin(buf[i], 8, ' ');
 			bin[i] = buf[i];
 			bin[i] = bin[i] + cle[c];
-			ft_putchar(cle[c]);
-			ft_putchar(' ');
+			ft_putchar(cle[c]);ft_putchar(' ');
 			ft_putbin(bin[i], 8, ' ');
-			ft_putchar(clerot[r]);
-			ft_putchar(' ');
+				ft_putchar(clerot[r]);ft_putchar(' ');
 			bin[i] = ft_rotatebin(bin[i], 'l', clerot[r] - '0');
 			ft_putbin(bin[i], 8, ' ');
 			bin[i] = 0xFF ^ bin[i];
 			ft_putbin(bin[i], 8, '\t');
-			write(fdw[0], (bin + i), 1);
+			write(fdw[0],(bin + i), 1);
 			ft_putchar(bin[i]);
 			ft_putchar('\n');
-			r = (r > ft_strlen((char *)clerot) - 2) ? 0 : r + 1;
-			c = (c > ft_strlen((char *)cle) - 2) ? 0 : c + 1;
+			r = (r > ft_strlen(clerot) - 2) ? 0 : r + 1;
+			c = (c > ft_strlen(cle) - 2) ? 0 : c + 1;
 			i++;
 			if (i < count && buf[i] != '\0')
 			{
 				if (buf[i] == '\n' || buf[i] == '\t')
 					ft_putchar('.');
 				else
-					ft_putchar(buf[i]);
-				ft_putchar(' ');
+					ft_putchar(buf[i]);ft_putchar(' ');
 				ft_putbin(buf[i], 8, ' ');
 				bin[i] = buf[i];
 				bin[i] = bin[i] + cle[c];
-				ft_putchar(cle[c]);
-				ft_putchar(' ');
+				ft_putchar(cle[c]);ft_putchar(' ');
 				ft_putbin(bin[i], 8, ' ');
-				ft_putchar(clerot[r]);
-				ft_putchar(' ');
+				ft_putchar(clerot[r]);ft_putchar(' ');
 				bin[i] = ft_rotatebin(bin[i], 'l', clerot[r] - '0');
 				ft_putbin(bin[i], 8, ' ');
 				bin[i] = 0xFF ^ bin[i];
 				ft_putbin(bin[i], 8, '\t');
 				ft_putchar(bin[i]);
 				ft_putchar('\n');
-				write(fdw[1], (bin + i), 1);
+				write(fdw[1],(bin + i), 1);
 			}
 			i++;
-			r = (r > ft_strlen((char *)clerot) - 2) ? 0 : r + 1;
-			c = (c > ft_strlen((char *)cle) - 2) ? 0 : c + 1;
+			r = (r > ft_strlen(clerot) - 2) ? 0 : r + 1;
+			c = (c > ft_strlen(cle) - 2) ? 0 : c + 1;
 		}
 	}
 	bin[i] = '\0';
-	write(fdw[0], (bin + i), 1);
-	write(fdw[1], (bin + i), 1);
+	write(fdw[0],(bin + i), 1);
+	write(fdw[1],(bin + i), 1);
 	free(buf);
 	free(bin);
 	free(filecrypt);
-	close(fdr);
-	close(fdw[0]);
-	close(fdw[1]);
+	close (fdr);
+	close (fdw[0]);
+	close (fdw[1]);
 	keybord();
 	return (0);
 }
 
-int		decrypt_file(char *file, unsigned char *cle, unsigned char *clerot, int afcode)
+int		decrypt_file(char *file, char *cle, char *clerot, int afcode)
 {
 	int		fdr[3];
-	unsigned char	*buf0;
-	unsigned char	*buf1;
-	unsigned char	*bin0;
-	unsigned char	*bin1;
+	char	*buf0;
+	char	*buf1;
+	char	*bin0;
+	char	*bin1;
 	char	**filecrypt;
 	int		count[2];
 	int		i;
@@ -263,11 +257,11 @@ int		decrypt_file(char *file, unsigned char *cle, unsigned char *clerot, int afc
 	bin1 = malloc(8 * sizeof(unsigned char));
 	if (afcode)
 		fn_aff_titre("Decryptage du Fichier");
-	for (i = 0; i < 2; i++)
+	for (i = 0 ; i < 2 ; i++)
 	{
 		ft_putstr("Open fichier ");
-		ft_putendl(filecrypt[i]);
-		fdr[i] = open(filecrypt[i], O_RDONLY);
+		ft_putendl(filecrypt[i]);// ft_putchar('\n');
+		fdr[i] = open(filecrypt[i],  O_RDONLY);
 		if (fdr[i] == -1)
 		{
 			printf("Erreur lecture fichier %s\n", filecrypt[i]);
@@ -279,14 +273,13 @@ int		decrypt_file(char *file, unsigned char *cle, unsigned char *clerot, int afc
 	r = 0;
 	while ((count[0] = read(fdr[0], buf0, 8)) > 0)
 	{
-		count[1] = read(fdr[1], buf1, 8);
+		count[1] = read(fdr[1], buf1, 8); 
 		i = 0;
 		while (i < count[0] && buf0[i] != '\0')
 		{
 			if (afcode)
 			{
-				ft_putchar(buf0[i]);
-				ft_putchar('\t');
+				ft_putchar(buf0[i]); ft_putchar('\t');
 				ft_putbin(buf0[i], 8, ' ');
 			}
 			bin0[i] = 0xFF ^ buf0[i];
@@ -309,13 +302,13 @@ int		decrypt_file(char *file, unsigned char *cle, unsigned char *clerot, int afc
 			ft_putchar(bin0[i]);
 			if (afcode)
 				ft_putchar('\n');
-			r = (r > ft_strlen((char *)clerot) - 2) ? 0 : r + 1;
-			c = (c > ft_strlen((char *)cle) - 2) ? 0 : c + 1;
+			r = (r > ft_strlen(clerot) - 2) ? 0 : r + 1;
+			c = (c > ft_strlen(cle) - 2) ? 0 : c + 1;
 			if (i < count[1] && buf1[i] != '\0')
 			{
 				if (afcode)
 				{
-					ft_putchar(buf1[i]);
+					ft_putchar(buf1[i]); 
 					ft_putchar('\t');
 					ft_putbin(buf1[i], 8, ' ');
 				}
@@ -342,40 +335,42 @@ int		decrypt_file(char *file, unsigned char *cle, unsigned char *clerot, int afc
 					ft_putchar('\n');
 			}
 			i++;
-			r = (r > ft_strlen((char *)clerot) - 2) ? 0 : r + 1;
-			c = (c > ft_strlen((char *)cle) - 2) ? 0 : c + 1;
+			r = (r > ft_strlen(clerot) - 2) ? 0 : r + 1;
+			c = (c > ft_strlen(cle) - 2) ? 0 : c + 1;
 		}
+		//		ft_putchar('\n');
 	}
 	free(buf0);
 	free(buf1);
 	free(bin0);
 	free(bin1);
 	free(filecrypt);
-	close(fdr[0]);
-	close(fdr[1]);
+	close (fdr[0]);
+	close (fdr[1]);
+
 	keybord();
 	return (0);
 }
 
-int		modif_key(unsigned char *cle, int afftitre)
+int		modif_key(char *cle, int afftitre)
 {
 	if (afftitre == 1)
 		fn_aff_titre("Modification Cle cryptage");
-	if (ft_strlen((char *)cle) > 0)
-		ft_putstrstr("\t \n", "\n\tCle de cryptage actuelle : ", (char *)cle);
+	if (ft_strlen(cle) > 0)
+		ft_putstrstr("\t \n", "\n\tCle de cryptage actuelle : ", cle);
 	ft_putstr("\n\tEntrez la Cle de cryptage a l'abri des regards : ");
 	scanf("%s", cle);
-	if (ft_strlen((char *)cle) > 20 || ft_strlen((char *)cle) < 5)
+	if (ft_strlen(cle) > 20 || ft_strlen(cle) < 5)
 	{
 		ft_putstr("\n\tCle invalide : de 4 - 20 caracteres\n");
 		modif_key(cle, 0);
 	}
 	else
-		ft_putstrstr("\n \n", "Nouvelle Cle validee :", (char *)cle); 
+		ft_putstrstr("\n \n", "Nouvelle Cle validee :", cle); 
 	return (0);
 }
 
-int		modif_keyrot(unsigned char *clerot, int afftitre)
+int		modif_keyrot(char *clerot, int afftitre)
 {
 	int		i;
 	int		ctrl;
@@ -383,51 +378,51 @@ int		modif_keyrot(unsigned char *clerot, int afftitre)
 	ctrl = 1;
 	if (afftitre == 1)
 		fn_aff_titre("Modification seconde Cle cryptage");
-	if (ft_strlen((char *)clerot) > 0)
-		ft_putstrstr("\t \n", "\n\tSeconde Cle de cryptage actuelle : ", (char *)clerot);
+	if (ft_strlen(clerot) > 0)
+		ft_putstrstr("\t \n", "\n\tSeconde Cle de cryptage actuelle : ", clerot);
 	ft_putstr("\n\tEntrez la Cle de cryptage a l'abri des regards : ");
 	scanf("%s", clerot);
-	i = ft_strlen((char *)clerot);
+	i = ft_strlen(clerot);
 	ctrl = 1;
 	while (i-- > 0)
 	{
 		if (!ft_isdigit(clerot[i]))
 		{
-			ft_putstr("\n\tCle invalide : uniquement des chiffres\n");
-			ctrl = 0;
+				ft_putstr("\n\tCle invalide : uniquement des chiffres\n");
+				ctrl = 0;
 		}
 	}
 	if (ctrl == 0)
 		modif_keyrot(clerot, 0);
-	if (ft_strlen((char *)clerot) > 10 || ft_strlen((char *)clerot) < 3)
+	if (ft_strlen(clerot) > 10 || ft_strlen(clerot) < 3)
 	{
 		ft_putstr("\n\tCle invalide : de 2 - 10 caracteres\n");
 		modif_keyrot(clerot, 0);
 	}
 	else
-		ft_putstrstr("\n \n", "Nouvelle Cle secondaire validee :", (char *)clerot);
+		ft_putstrstr("\n \n", "Nouvelle Cle secondaire validee :", clerot);
 	return (0);
 }
 
-void	fn_majvar(unsigned char *var, char *val)
+void	fn_majvar(char *var, char *val)
 {
-	ft_putnbr(ft_strlen((char *)var));
+	ft_putnbr(ft_strlen(var));
 	while (*val != '\0')
 		*var++ = *val++;
 	*var = '\0';
 }
 
-int		main(int argc, char **argv)
+int		main(int argc, char **argv )
 {
-	char			menu;
-	char			*file;
-	unsigned char	*cle;
-	unsigned char	*clerot;
-	char			*version;
+	char		menu;
+	char		*file;
+	char		*cle;
+	char		*clerot;
+	char		*version;
 
-	version = "v1.c";
-	cle = ft_memalloc(sizeof(unsigned char) * 20);
-	clerot = ft_memalloc(sizeof(unsigned char) * 10);
+	version = "v1.b";
+	cle = ft_memalloc(sizeof(char) * 20);
+	clerot = ft_memalloc(sizeof(char) * 10);
 	fn_majvar(cle, "dominiquephoteam");
 	fn_majvar(clerot, "1234");
 	file = ft_memalloc(sizeof(char) * 20);
@@ -443,9 +438,8 @@ int		main(int argc, char **argv)
 		{
 			fn_aff_titre("Informations");
 			ft_putstrstr("\t \n", "Version : ", version);
-			ft_putstrstr("\t \n", "Fichier : ", version);
-			ft_putstrstr("\t \n", "cle de cryptage : ", (char *)cle);
-			ft_putstrstr("\t \n", "cle de cryptage seconde : ", (char *)clerot);
+			ft_putstrstr("\t \n", "cle de cryptage : ", cle);
+			ft_putstrstr("\t \n", "cle de cryptage seconde : ", clerot);
 			keybord();
 		}
 		if (ft_tolower(menu) == 'k')
