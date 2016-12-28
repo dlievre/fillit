@@ -1,0 +1,54 @@
+#ifdef WIN32
+    #define clear() system("cls")
+#else
+    #ifdef UNIX
+        #define clear() system("clear")
+    #else
+ 
+        #ifndef NBLIGCLS
+            #define NBLIGCLS 30
+        #endif
+ 
+        void clear()
+        {
+            int i;
+            for(i = 0; i < NBLIGCLS; i++)
+            {
+                printf("\n");
+            }
+        }
+    #endif
+#endif
+
+clear();
+
+
+int		new(char *cle)
+{
+	char	**tbl;
+	char	*ligne;
+	char	*saisie;
+	int		no;
+
+	clear();
+	no = 0;
+	tbl = ft_memalloc((no + 1)* sizeof(*tbl));
+	saisie = ft_memalloc(255* sizeof(char));
+
+		printf("\n\tEntrez la ligne d'info : ");
+		while (*saisie != 'x')
+		{
+			scanf("%s", saisie);
+			if (ft_strlen(saisie) > 1 && *saisie != 'x')
+			{
+
+				tbl = realloc(tbl, (++no + 1));
+				ligne = ft_strnew(ft_strlen(saisie));
+				ligne = saisie;
+				tbl[no] = ligne;
+				ft_putnbr(ft_strlen(saisie)); ft_putchar(' ');ft_putendl(tbl[no]);
+			}
+
+		}
+
+}
