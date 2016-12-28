@@ -6,11 +6,12 @@
 /*   By: dlievre <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/20 15:03:22 by dlievre           #+#    #+#             */
-/*   Updated: 2016/12/27 17:09:41 by dlievre          ###   ########.fr       */
+/*   Updated: 2016/12/28 17:05:04 by dlievre          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./libft/libft.h"
+#include "./system.h"
 #include <fcntl.h>
 #include <stdio.h>
 
@@ -33,17 +34,20 @@ int		fn_aff_titre(char *str)
 
 void	aff_menu(char *file)
 {
+	clear ();
 	ft_putstr("\n\n");
 	fn_aff_titre("Crypto de donnees");
 	ft_putstr("\tF\tFichier actuel : ");
 	ft_putendl(file);
 	ft_putstr("\n\n");
 	ft_putstr("\tV\tDecrypter/Visualiser\n");
+	ft_putstr("\tN\tNouveau Fichier\n");
 	ft_putstr("\tE\tEditer\n");
 	ft_putstr("\tA\tAjouter\n");
 	ft_putstr("\tS\tSupprimer\n");
 	ft_putstr("\n\n");
 	ft_putstr("\tK\tKey de cryptage\n");
+
 	ft_putstr("\tC\tCrypter > Fichiers\n");
 	ft_putstr("\tD\tDecrypter\n");
 	ft_putstr("\tL\tLecture Binaire\n");
@@ -57,7 +61,7 @@ char	keybord(void)
 	char	buf[1];
 
 	while ((count = read(0, buf, sizeof(buf))) > 0)
-		if (ft_strchr("FfVvEeAaSsKkCcDdLlXx?\n", buf[0]) != NULL)
+		if (ft_strchr("FfVvNnEeAaSsKkCcDdLlXx?\n", buf[0]) != NULL)
 			break ;
 	return (buf[0]);
 }
@@ -133,8 +137,9 @@ int		crypt_file(char *file, unsigned char *cle, unsigned char *clerot)
 	int				i;
 	int				c;
 	int				r;
-	unsigned char	*pbin;
+//	unsigned char	*pbin;
 
+	clear ();
 	filecrypt = ft_memalloc((3 + 1) * sizeof(*filecrypt));
 	filecrypt[0] = malloc(sizeof(char) * (ft_strlen(file) + 4 + 1));
 	filecrypt[1] = malloc(sizeof(char) * (ft_strlen(file) + 4 + 1));
@@ -250,6 +255,7 @@ int		decrypt_file(char *file, unsigned char *cle, unsigned char *clerot, int afc
 	int		c;
 	int		r;
 
+	clear ();
 	filecrypt = ft_memalloc((3 + 1) * sizeof(*filecrypt));
 	filecrypt[0] = malloc(sizeof(char) * (ft_strlen(file) + 4 + 1));
 	filecrypt[1] = malloc(sizeof(char) * (ft_strlen(file) + 4 + 1));
@@ -359,6 +365,7 @@ int		decrypt_file(char *file, unsigned char *cle, unsigned char *clerot, int afc
 
 int		modif_key(unsigned char *cle, int afftitre)
 {
+	clear ();
 	if (afftitre == 1)
 		fn_aff_titre("Modification Cle cryptage");
 	if (ft_strlen((char *)cle) > 0)
@@ -380,6 +387,7 @@ int		modif_keyrot(unsigned char *clerot, int afftitre)
 	int		i;
 	int		ctrl;
 
+	clear ();
 	ctrl = 1;
 	if (afftitre == 1)
 		fn_aff_titre("Modification seconde Cle cryptage");
@@ -417,6 +425,46 @@ void	fn_majvar(unsigned char *var, char *val)
 	*var = '\0';
 }
 
+char	**new(char *file, unsigned char *cle, unsigned char *clerot)
+{
+	char	**tbl;
+	char	*ligne;
+	char	*saisie;
+	int		no;
+	int		i;
+	char	count;
+
+	no = 0;
+	tbl = ft_memalloc((no + 1) * sizeof(*tbl));
+	saisie = ft_memalloc(255 * sizeof(char));
+
+
+	fn_aff_titre("Nouveau fichier");
+	ft_putstr("\n\tEntrez la ligne d'information avec tabulations \n ");
+
+	while (*saisie != 'x')
+	{
+		count = read(0, saisie, 255);
+		//scanf("%s", saisie);
+		if (ft_strlen(saisie) > 1 && *saisie != 'x')
+		{
+			tbl = realloc(tbl, (no + 1 + 1) * sizeof(*tbl));
+			ligne = ft_strnew(ft_strlen(saisie));
+			tbl[no] = ft_memcpy(ligne, saisie, ft_strlen(saisie));
+			no++;
+			
+		}
+	}
+			ft_putstr("Fin de la saisie\n");
+			fn_aff_titre("tableau de saisie\n");
+			ft_putstr("Nb Elem\n");ft_putnbr(no);ft_putchar('\n');
+	i = 0;
+	while (i < no)
+		ft_putendl(tbl[i++]);
+return (tbl);
+
+}
+
 int		main(int argc, char **argv)
 {
 	char			menu;
@@ -436,6 +484,7 @@ int		main(int argc, char **argv)
 	aff_menu(file);
 	while (menu != 'x')
 	{
+		
 		menu = keybord();
 		if (ft_tolower(menu) == 'l')
 			fn_read_binary(file);
@@ -457,6 +506,8 @@ int		main(int argc, char **argv)
 			crypt_file(file, cle, clerot);
 		if (ft_tolower(menu) == 'd')
 			decrypt_file(file, cle, clerot, 1);
+		if (ft_tolower(menu) == 'n')
+			new(file, cle, clerot);
 		if (ft_tolower(menu) == 'v')
 			decrypt_file(file, cle, clerot, 0);
 		if (ft_tolower(menu) == 'f')
