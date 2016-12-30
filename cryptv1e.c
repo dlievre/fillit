@@ -15,16 +15,6 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-typedef struct info
-{
-	int			id;
-	char		*site;
-	char		*lien;
-	//char		*identifiant;
-	//char		*mdp;
-	//char		*info;
-} structinfo;
-
 int		fn_aff_titre(char *str)
 {
 	int	i;
@@ -70,11 +60,9 @@ char	keybord(void)
 	int		count;
 	char	buf[1];
 
-	while ((count = read(0, buf, 1)) > 0)
-	{
-		if (ft_strchr("1TtFfVvNnEeAaSsKkCcDdLlXx?\n", buf[0]) != NULL)
+	while ((count = read(0, buf, sizeof(buf))) > 0)
+		if (ft_strchr("FfVvNnEeAaSsKkCcDdLlXx?\n", buf[0]) != NULL)
 			break ;
-	}
 	return (buf[0]);
 }
 
@@ -437,137 +425,6 @@ void	fn_majvar(unsigned char *var, char *val)
 	*var = '\0';
 }
 
-
-
-void 	aff_struct(structinfo *elem )
-{
-ft_putnbr(elem->id);
-ft_putchar('\t');
-ft_putstr(elem->site);
-ft_putchar('\t');
-ft_putstr(elem->lien);
-//ft_putchar('\n');
-//ft_putchar('\t');
-//ft_putstr(elem->identifiant);
-//ft_putchar('\t');
-//ft_putstr(elem->mdp);
-//ft_putchar('\t');
-//ft_putstr(elem->info);
-ft_putchar('\n');
-}
-
-static void purger_stdin(void)
-{
-    int c;
-
-    while ((c = getchar()) != '\n' && c != EOF)
-    {}
-}
-
-static void fn_delnl(char *chaine)
-{
-    char *p = ft_strchr(chaine, '\n');
-
-    if (p)
-        *p = 0;
-}
-
-
-void 	fn_defstruct(char *file)
-{
-	char	*ligne;
-	char	*saisie;
-	int		no;
-	int 	i;
-	int		count;
-	char	*elem;
-
-
-	fn_aff_titre("Structure");
-	structinfo titre;
-	titre.id = 0;
-	titre.site = "Site";
-	titre.lien = "Lien";
-	//titre.identifiant = "Identifiant";
-	//titre.mdp = "Mdp";
-	//titre.info = "Info";
-
-	//aff_struct(&titre);
-	no = 0;
-	//tbl = ft_memalloc((no + 1) * sizeof(*tbl));
-	saisie = ft_memalloc(255 * sizeof(char));
-	elem = ft_memalloc(10 * sizeof(char));
-
-
-	fn_aff_titre("Saisie Informations");
-
-	
-	while (*saisie != 27)
-	{
-		ft_putstr("\n\tEntrez les informations ( sortir par Escape ) \n ");
-		purger_stdin();
-		ft_putstrstr("\t \n", "Id = ", ft_itoa(no));
-		ft_putstrstr("\t  ", titre.site, " : ");
-		count = read(0, saisie, 255);
-		//if (ft_strlen(saisie) > 1 && *saisie != 27)
-		//{
-
-		structinfo elem[no];
-		elem[no].id = no;
-		fn_delnl(saisie);
-		ligne = ft_strnew(ft_strlen(saisie));
-		elem[no].site = ft_memcpy(ligne, saisie, ft_strlen(saisie));
-		ft_putstrstr("\t  ", titre.lien, " : ");
-		count = read(0, saisie, 255);
-		fn_delnl(saisie);
-		ligne = ft_strnew(ft_strlen(saisie));
-		elem[no].lien = ft_memcpy(ligne, saisie, ft_strlen(saisie));
-		ft_putchar('\n');
-		aff_struct(&elem[no]);
-		no++;
-		//}
-		purger_stdin();
-		ft_putstr("\n\tRetour chariot pour suivant \n ");
-		count = read(0, saisie, 2);
-		if (*saisie != 10)
-			break ;
-
-
-	}
-	i = 0;
-	while (i < no)
-	{
-		structinfo elem[i];
-		aff_struct(&elem[i]);
-		i++;
-
-	}
-	/*
-		while (*saisie != 27)
-	{
-		purger_stdin();
-		ft_putstrstr("\t \n", "Id = ", ft_itoa(no));
-		ft_putstrstr("\t  ", titre.site, " : ");
-		count = read(0, saisie, 255);
-		if (ft_strlen(saisie) > 1 && *saisie != 27)
-		{
-		structinfo titre3;
-		titre3.id = no;
-		fn_delnl(saisie);
-		ligne = ft_strnew(ft_strlen(saisie));
-		titre3.site = ft_memcpy(ligne, saisie, ft_strlen(saisie));
-		ft_putstrstr("\t  ", titre.lien, " : ");
-		count = read(0, saisie, 255);
-		fn_delnl(saisie);
-		ligne = ft_strnew(ft_strlen(saisie));
-		titre3.lien = ft_memcpy(ligne, saisie, ft_strlen(saisie));
-		ft_putchar('\n');
-		aff_struct(&titre3);
-		}
-	}*/
-keybord();
-}
-
 char	**new(char *file, unsigned char *cle, unsigned char *clerot)
 {
 	char	**tbl;
@@ -575,9 +432,7 @@ char	**new(char *file, unsigned char *cle, unsigned char *clerot)
 	char	*saisie;
 	int		no;
 	int		i;
-	int		count;
-
-
+	char	count;
 
 	no = 0;
 	tbl = ft_memalloc((no + 1) * sizeof(*tbl));
@@ -601,7 +456,7 @@ char	**new(char *file, unsigned char *cle, unsigned char *clerot)
 		}
 	}
 			ft_putstr("Fin de la saisie\n");
-			fn_aff_titre("tableau de saisie");
+			fn_aff_titre("tableau de saisie\n");
 			ft_putstr("Nb Elem\n");ft_putnbr(no);ft_putchar('\n');
 	i = 0;
 	while (i < no)
@@ -618,7 +473,7 @@ int		main(int argc, char **argv)
 	unsigned char	*clerot;
 	char			*version;
 
-	version = "v1.d";
+	version = "v1.c";
 	cle = ft_memalloc(sizeof(unsigned char) * 20);
 	clerot = ft_memalloc(sizeof(unsigned char) * 10);
 	fn_majvar(cle, "dominiquephoteam");
@@ -631,14 +486,13 @@ int		main(int argc, char **argv)
 	{
 		
 		menu = keybord();
-		ft_putchar(menu);
 		if (ft_tolower(menu) == 'l')
 			fn_read_binary(file);
 		if (menu == '?')
 		{
 			fn_aff_titre("Informations");
 			ft_putstrstr("\t \n", "Version : ", version);
-			ft_putstrstr("\t \n", "Fichier : ", file);
+			ft_putstrstr("\t \n", "Fichier : ", version);
 			ft_putstrstr("\t \n", "cle de cryptage : ", (char *)cle);
 			ft_putstrstr("\t \n", "cle de cryptage seconde : ", (char *)clerot);
 			keybord();
@@ -653,8 +507,6 @@ int		main(int argc, char **argv)
 		if (ft_tolower(menu) == 'd')
 			decrypt_file(file, cle, clerot, 1);
 		if (ft_tolower(menu) == 'n')
-			fn_defstruct(file);
-		if (ft_tolower(menu) == 'z')
 			new(file, cle, clerot);
 		if (ft_tolower(menu) == 'v')
 			decrypt_file(file, cle, clerot, 0);
